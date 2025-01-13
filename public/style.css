@@ -1,0 +1,261 @@
+/* Reset styles */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+/* Body styling */
+
+body {
+    font-family: 'Arial', sans-serif;
+    background: #f3f4f6;
+    /* Neutral background */
+    overflow: hidden;
+    /* Prevent scroll for bubbles */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    flex-direction: column;
+    color: #333;
+    position: relative;
+    /* For bubble positioning */
+}
+
+footer a {
+    color: #3498db;
+    /* Default icon color */
+    text-decoration: none;
+    /* No underline */
+    margin: 0 10px;
+    /* Space between icons */
+    transition: color 0.3s ease;
+    /* Smooth color transition */
+}
+
+footer a:hover {
+    color: #2ecc71;
+    /* Change to green on hover */
+}
+
+
+/* Bubble Animations */
+
+@keyframes float {
+    0% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: translateY(-50px) scale(1.1);
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+.bubble {
+    position: absolute;
+    border-radius: 50%;
+    background: linear-gradient(45deg, #4CAF50, #2196F3);
+    /* Green & blue bubble gradient */
+    animation: float 8s infinite ease-in-out;
+    z-index: 1;
+    opacity: 0.6;
+}
+
+
+/* Bubble sizes and positions */
+
+.bubble:nth-child(1) {
+    width: 100px;
+    height: 100px;
+    top: 10%;
+    left: 15%;
+    animation-duration: 6s;
+}
+
+.bubble:nth-child(2) {
+    width: 120px;
+    height: 120px;
+    top: 30%;
+    left: 70%;
+    animation-duration: 8s;
+}
+
+.bubble:nth-child(3) {
+    width: 150px;
+    height: 150px;
+    bottom: 20%;
+    left: 50%;
+    animation-duration: 10s;
+}
+
+.bubble:nth-child(4) {
+    width: 80px;
+    height: 80px;
+    bottom: 10%;
+    right: 10%;
+    animation-duration: 12s;
+}
+
+
+/* Container styling */
+
+.container {
+    position: relative;
+    background: rgba(255, 255, 255, 0.9);
+    /* Light background with slight transparency */
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    width: 350px;
+    max-width: 90%;
+    text-align: center;
+    z-index: 10;
+    /* Above bubbles */
+}
+
+
+/* Header styling */
+
+h1 {
+    font-size: 2.2rem;
+    margin-bottom: 15px;
+    color: #4CAF50;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+h6 {
+    font-size: 1rem;
+    margin-bottom: 20px;
+    color: #555;
+}
+
+
+/* Input styling */
+
+input[type="file"],
+input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: 0.3s ease;
+    background: #f9f9f9;
+}
+
+input[type="file"]:focus,
+input[type="text"]:focus {
+    outline: none;
+    border-color: #4CAF50;
+    box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+}
+
+
+/* Button styling */
+
+button {
+    background-color: #4CAF50;
+    color: #fff;
+    border: none;
+    padding: 12px 24px;
+    cursor: pointer;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: 0.3s ease;
+}
+
+button:hover {
+    background-color: #3e8e41;
+    transform: translateY(-2px);
+}
+
+
+/* Image Styling */
+
+#pageImage {
+    width: 100px;
+    margin: 20px auto;
+    display: block;
+    z-index: 5;
+    opacity: 0.9;
+}
+
+
+/* Info icon styling */
+
+.info-container {
+    position: fixed;
+    /* Fixes the position on the screen */
+    top: 20px;
+    /* Positions it 20px from the top */
+    right: 20px;
+    /* Positions it 20px from the right */
+    z-index: 1000;
+    /* Ensures it stays above other elements */
+    display: inline-block;
+}
+
+.info-icon {
+    font-size: 24px;
+    /* Makes the icon slightly larger */
+    color: #4CAF50;
+    /* Matches the theme color */
+    cursor: pointer;
+    /* Indicates interactivity */
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.info-icon:hover {
+    color: #3e8e41;
+    /* Changes color on hover */
+    transform: scale(1.1);
+    /* Slightly enlarges the icon on hover */
+}
+
+
+/* Tooltip box styling */
+
+.info-box {
+    visibility: hidden;
+    /* Hides the tooltip by default */
+    width: 250px;
+    /* Sets the tooltip width */
+    background-color: #fff;
+    /* White background for readability */
+    color: #333;
+    /* Dark text for contrast */
+    text-align: left;
+    border-radius: 8px;
+    /* Rounded corners for the box */
+    padding: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    /* Adds a subtle shadow */
+    position: absolute;
+    top: 30px;
+    /* Positions the tooltip below the icon */
+    right: 0;
+    /* Aligns the tooltip to the right edge */
+    z-index: 1001;
+    /* Keeps the tooltip above all elements */
+    opacity: 0;
+    /* Hidden by default */
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    /* Smooth fade-in */
+}
+
+.info-container:hover .info-box {
+    visibility: visible;
+    /* Shows the tooltip on hover */
+    opacity: 1;
+    /* Makes it fully visible */
+}

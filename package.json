@@ -1,0 +1,23 @@
+{
+    "name": "fender_backend",
+    "version": "1.0.0",
+    "description": "AWS Based File Sharing System",
+    "main": "app.js",
+    "scripts": {
+        "start": "node app.js",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "aws-sdk": "^2.1692.0",
+        "axios": "^1.7.8",
+        "dotenv": "^16.4.6",
+        "express": "^4.21.1",
+        "multer": "^1.4.5-lts.1"
+    },
+    "engines": {
+        "node": "16.x"
+    }
+}

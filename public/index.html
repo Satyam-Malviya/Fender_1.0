@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>File Sharing System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+
+    <div class="container">
+        <h1>Fender</h1>
+        <h6>AWS Based File Sharing System</h6>
+        <button onclick="window.location.href='/share'">Share a File</button>
+        <button onclick="window.location.href='/receive'">Receive a File</button>
+    </div>
+    <div class="info-container">
+        <i class="fas fa-info-circle info-icon"></i>
+        <div class="info-box">
+            <p><strong>How Fender Works:</strong></p>
+            <ul>
+                <li>
+                    To share a file, click on "Share a File" and upload your document.
+                </li>
+                <li>You will receive a unique link to share with others.</li>
+                <li>To receive a file, click "Receive a File" and enter the link.</li>
+                <li>Files are securely stored and transferred via AWS S3.</li>
+            </ul>
+        </div>
+    </div>
+
+    <footer style="
+        background-color: #2c3e50;
+        color: white;
+        text-align: center;
+        padding: 10px 0;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+      ">
+        <p style="margin: 0">
+            Made by<strong> Satyam Malviya & Mehul Kumar Chawra</strong>
+        </p>
+        <p style="margin: 0">
+            <a href="mailto:satyaminstudy@gmail.com" style="color: #3498db; text-decoration: none; margin: 0 10px">
+                <i class="fas fa-envelope fa-lg"></i>
+            </a>
+        </p>
+    </footer>
+</body>
+
+</html>
