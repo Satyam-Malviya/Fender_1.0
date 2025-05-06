@@ -1,15 +1,15 @@
 const AWS = require('aws-sdk');
 
 const s3 = new AWS.S3({
-    accessKeyId: "AKIAYXWBNYDWGX23WGNX",
-    secretAccessKey: "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",
-    region: "us-east-1",
+    accessKeyId: "AKIAZDSDULQLESYD23XP",
+    secretAccessKey: "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",
+    region: "ap-south-1",
 });
 
 
 const uploadFile = async(file) => {
     const params = {
-        Bucket: "fenderbucket",
+        Bucket: "fender-bkt",
         Key: file.originalname,
         Body: file.buffer,
         ContentType: file.mimetype,
@@ -25,9 +25,9 @@ const uploadFile = async(file) => {
 
 const generateSignedUrl = async(fileName) => {
     const params = {
-        Bucket: "fenderbucket",
+        Bucket: "fender-bkt",
         Key: fileName,
-        Expires: 60 * 5, // URL expires in 5 minutes
+        Expires: 60 * 5,
     };
     try {
         const url = await s3.getSignedUrlPromise('getObject', params);
