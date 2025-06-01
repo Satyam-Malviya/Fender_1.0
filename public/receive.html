@@ -1,32 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta
-      property="og:title"
-      content="Fender - Cloud-Based File Sharing System"
-    />
-    <meta
-      property="og:description"
-      content="Securely share and receive files with ease using Fender. Powered by AWS."
-    />
-    <meta property="og:image" content="https://fender-app.com/logo.png" />
-    <meta property="og:url" content="https://fender-app.com" />
-    <meta property="og:type" content="website" />
-
-    <meta
-      name="description"
-      content="Fender - A secure, cloud-based file-sharing system. Share and receive files with ease."
-    />
-    <meta
-      name="keywords"
-      content="file sharing, cloud storage, secure file sharing, Fender app"
-    />
-    <meta name="author" content="Satyam Malviya, Mehul Kumar Chawra" />
-    <meta name="robots" content="index, follow" />
-    <title>Fender | Receive File</title>
-    <!-- Combined title -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Receive File | Fender</title>
+    <!-- Add OG, meta, etc. from index.html -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Montserrat:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <link
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
       rel="stylesheet"
@@ -39,28 +21,57 @@
     <div class="bubble"></div>
     <div class="bubble"></div>
     <div class="bubble"></div>
-    <!-- AdSense script (fender-ad-hori) REMOVED -->
 
-    <div class="container">
+    <div class="app-container">
       <h1>Receive Your File</h1>
+      <input
+        type="text"
+        id="fileNameInput"
+        placeholder="Paste file link or enter file name"
+      />
 
-      <input type="text" id="fileName" placeholder="Enter file name or link" />
+      <div class="action-buttons">
+        <button class="btn" onclick="receiveFile()">
+          <i class="fas fa-file-import"></i> Get File
+        </button>
+        <button class="btn btn-info" onclick="pasteFileName()">
+          <i class="fas fa-paste"></i> Paste Link
+        </button>
+        <button class="btn btn-secondary" onclick="window.location.href='/'">
+          <i class="fas fa-home"></i> Back
+        </button>
+      </div>
 
-      <button onclick="pasteFileName()">Paste</button>
-      <button onclick="receiveFile()">Get File</button>
-      <button onclick="window.location.href='/'">Back</button>
-
-      <p id="statusMessage"></p>
-      <div id="filePreview"></div>
+      <div
+        id="statusMessage"
+        class="status-message"
+        style="display: none"
+      ></div>
+      <div id="filePreview" style="margin-top: 15px"></div>
+      <!-- Content populated by JS -->
     </div>
 
     <script>
+      function setStatus(message, type = "info") {
+        const statusElement = document.getElementById("statusMessage");
+        statusElement.textContent = message;
+        statusElement.className = `status-message ${type}`;
+        statusElement.style.display = message ? "block" : "none";
+        if (type === "error") {
+          document.getElementById("filePreview").innerHTML = ""; // Clear preview on error
+        }
+      }
+
       window.onload = function () {
         const urlParams = new URLSearchParams(window.location.search);
         const fileFromUrl = urlParams.get("file");
         if (fileFromUrl) {
-          document.getElementById("fileName").value =
+          document.getElementById("fileNameInput").value =
             decodeURIComponent(fileFromUrl);
+          setStatus(
+            "File identifier loaded from link. Click 'Get File'.",
+            "info"
+          );
         }
       };
 
@@ -68,35 +79,27 @@
         navigator.clipboard
           .readText()
           .then((text) => {
-            try {
-              const url = new URL(text);
-              if (url.pathname === "/receive" && url.searchParams.has("file")) {
-                document.getElementById("fileName").value = decodeURIComponent(
-                  url.searchParams.get("file")
-                );
-                return;
-              }
-            } catch (e) {
-              // Not a valid URL or not our specific link format
-            }
-            document.getElementById("fileName").value = text;
+            document.getElementById("fileNameInput").value = text;
+            setStatus("Content pasted. Click 'Get File'.", "info");
           })
           .catch((error) => {
-            alert("Failed to paste content: " + error);
+            setStatus("Failed to paste: " + error, "error");
           });
       }
 
       function receiveFile() {
-        let fileNameInput = document.getElementById("fileName").value.trim(); // Trim whitespace
-        if (!fileNameInput) {
-          alert("Please enter a file name or link");
+        let userInput = document.getElementById("fileNameInput").value.trim();
+        if (!userInput) {
+          setStatus("Please enter a file name or link", "error");
           return;
         }
+        setStatus("Fetching file...", "info");
+        document.getElementById("filePreview").innerHTML = ""; // Clear previous
 
-        let actualFileName = fileNameInput;
-        // Try to extract filename if a full Fender link is entered/pasted
+        let actualFileName = userInput;
         try {
-          const url = new URL(fileNameInput); // This will throw if fileNameInput is not a valid absolute URL
+          // Try to parse as URL to extract filename if it's one of our links
+          const url = new URL(userInput);
           if (
             (url.origin === window.location.origin ||
               url.protocol === "http:" ||
@@ -107,21 +110,16 @@
             actualFileName = decodeURIComponent(url.searchParams.get("file"));
           }
         } catch (e) {
-          // It's not an absolute URL or not our link format, assume it's a direct filename
+          /* Not our specific URL format, or not a URL at all; treat as filename */
         }
 
         if (!actualFileName) {
-          // After potential parsing, check if filename is empty
-          alert("Invalid file identifier provided.");
+          setStatus("Invalid file identifier provided.", "error");
           return;
         }
 
-        document.getElementById("statusMessage").innerText = "Fetching file...";
-        document.getElementById("filePreview").innerHTML = "";
-
-        fetch(`/api/files/share/${encodeURIComponent(actualFileName)}`, {
-          method: "GET",
-        })
+        // Encode for the API call as it goes into the URL path
+        fetch(`/api/files/share/${encodeURIComponent(actualFileName)}`)
           .then(async (response) => {
             if (!response.ok) {
               let errorMsg = `Error: ${response.status}`;
@@ -132,7 +130,6 @@
                   errorData.message ||
                   `File not found or server error. Status: ${response.status}`;
               } catch (e) {
-                // Failed to parse JSON, use status text or default
                 errorMsg =
                   response.statusText ||
                   `File not found or server error. Status: ${response.status}`;
@@ -143,80 +140,64 @@
           })
           .then((data) => {
             if (data.url) {
-              document.getElementById("statusMessage").innerText =
-                "File found! Click the link below.";
+              setStatus(
+                "File found! Click link below to download/preview.",
+                "success"
+              );
               const filePreview = document.getElementById("filePreview");
-              filePreview.innerHTML = `<a href="${data.url}" target="_blank" rel="noopener noreferrer">Click here to preview or download '${actualFileName}'</a>`;
+              // Sanitize data.url just in case, though it's from our backend
+              const safeUrl = data.url.startsWith("http") ? data.url : "#";
+              const decodedFileNameForDisplay =
+                decodeURIComponent(actualFileName); // Show original name nicely
+              filePreview.innerHTML = `<a href="${safeUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-success" style="text-decoration:none; display:inline-block; margin-top:10px;"><i class="fas fa-download"></i> Download/Preview '${decodedFileNameForDisplay}'</a>`;
             } else {
-              document.getElementById("statusMessage").innerText =
-                data.message || "File not found (no URL provided).";
+              setStatus(
+                data.message || "File not found (no URL provided).",
+                "error"
+              );
             }
           })
           .catch((error) => {
             console.error("Error receiving file:", error);
-            document.getElementById("statusMessage").innerText = `${
-              error.message || "Could not retrieve the file."
-            }`;
+            setStatus(
+              `${error.message || "Could not retrieve the file."}`,
+              "error"
+            );
           });
       }
     </script>
-    <div
-      style="
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        background-color: #f3f3f3;
-        padding: 20px;
-        border-top: 1px solid #ddd;
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-        z-index: 10;
-      "
-    >
-      <div style="text-align: center; margin: 10px">
+    <footer class="app-footer">
+      <!-- Footer content from index.html -->
+      <div class="footer-column">
         <p>Made by <strong>Satyam Malviya</strong></p>
         <a
           href="https://www.linkedin.com/in/satyam-malviya-377920260"
           target="_blank"
-          style="display: inline-block; margin-top: 5px"
-        >
-          <img
+          ><img
             src="https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png"
             alt="LinkedIn"
-            style="width: 24px; height: auto"
-          />
-        </a>
+        /></a>
       </div>
-      <div style="text-align: center; margin: 10px">
+      <div class="footer-column">
         <p><strong>Abhimanyu Nema</strong></p>
         <a
           href="https://www.linkedin.com/in/abhimanyu-nema-048477248"
           target="_blank"
-          style="display: inline-block; margin-top: 5px"
-        >
-          <img
+          ><img
             src="https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png"
             alt="LinkedIn"
-            style="width: 24px; height: auto"
-          />
-        </a>
+        /></a>
       </div>
-      <div style="text-align: center; margin: 10px">
+      <div class="footer-column">
         <p>and <strong>Mehul Kumar Chawra</strong></p>
         <a
           href="https://www.linkedin.com/in/mehul-chawra-69295a258"
           target="_blank"
-          style="display: inline-block; margin-top: 5px"
-        >
-          <img
+          ><img
             src="https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png"
             alt="LinkedIn"
-            style="width: 24px; height: auto"
-          />
-        </a>
+        /></a>
       </div>
-    </div>
+    </footer>
   </body>
 </html>

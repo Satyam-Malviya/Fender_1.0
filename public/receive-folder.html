@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Receive Folder | Fender</title>
+    <!-- Meta tags and links (Font Awesome, Google Fonts, style.css) as before -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+
+    <div class="app-container">
+      <h1>Receive Shared Folder</h1>
+
+      <input
+        type="text"
+        id="folderIdentifierInput"
+        placeholder="Paste folder link or enter Folder ID"
+        style="margin-bottom: 10px"
+      />
+
+      <!-- Initial action buttons always visible before folder is loaded -->
+      <div id="initialActionButtons" class="action-buttons">
+        <button class="btn" onclick="processFolderIdentifier()">
+          <i class="fas fa-folder-open"></i> Get Folder
+        </button>
+        <button class="btn btn-info" onclick="pasteFolderIdentifier()">
+          <i class="fas fa-paste"></i> Paste Link/ID
+        </button>
+        <button class="btn btn-secondary" onclick="window.location.href='/'">
+          <i class="fas fa-home"></i> Back to Home
+        </button>
+        <!-- BACK BUTTON HERE -->
+      </div>
+
+      <div
+        id="statusMessage"
+        class="status-message"
+        style="margin-top: 15px; display: block"
+      >
+        Enter a folder link or ID to retrieve its contents.
+      </div>
+
+      <!-- This container will hold buttons that are relevant AFTER folder is loaded -->
+      <div
+        id="folderLoadedActionButtons"
+        class="action-buttons"
+        style="margin-bottom: 20px; display: none"
+      >
+        <button
+          id="downloadAllBtn"
+          class="btn btn-success"
+          onclick="downloadAllAsZip()"
+        >
+          <i class="fas fa-file-archive"></i> Download All as ZIP
+        </button>
+        <!-- "Back to Home" is now in initial actions, but could be duplicated here if preferred -->
+      </div>
+
+      <div
+        id="fileListContainerOuter"
+        class="file-list-container"
+        style="display: none"
+      >
+        <!-- File list ul will be appended here by JS -->
+      </div>
+    </div>
+
+    <script>
+      let currentFolderShareId = "";
+
+      function setStatus(message, type = "info") {
+        // ... (setStatus function remains the same as the previous version) ...
+        const statusElement = document.getElementById("statusMessage");
+        statusElement.textContent = message;
+        statusElement.className = `status-message ${type}`;
+        statusElement.style.display = message ? "block" : "none";
+      }
+
+      window.onload = async () => {
+        // ... (window.onload logic remains the same, including auto-processing if ID in URL) ...
+        const urlParams = new URLSearchParams(window.location.search);
+        const folderIdFromUrl = urlParams.get("id");
+        if (folderIdFromUrl) {
+          document.getElementById("folderIdentifierInput").value =
+            folderIdFromUrl;
+          processFolderIdentifier(folderIdFromUrl);
+        } else {
+          setStatus(
+            "Enter a folder link or ID to retrieve its contents.",
+            "info"
+          );
+        }
+      };
+
+      function pasteFolderIdentifier() {
+        // ... (pasteFolderIdentifier function remains the same) ...
+        navigator.clipboard
+          .readText()
+          .then((text) => {
+            document.getElementById("folderIdentifierInput").value =
+              text.trim();
+            setStatus("Content pasted. Click 'Get Folder'.", "info");
+          })
+          .catch((error) => {
+            setStatus("Failed to paste: " + error, "error");
+          });
+      }
+
+      async function processFolderIdentifier(idFromUrl = null) {
+        // ... (logic for extracting identifier and calling API remains the same) ...
+        let identifier = idFromUrl
+          ? idFromUrl.trim()
+          : document.getElementById("folderIdentifierInput").value.trim();
+        document.getElementById("fileListContainerOuter").style.display =
+          "none";
+        document.getElementById("fileListContainerOuter").innerHTML = "";
+        document.getElementById("folderLoadedActionButtons").style.display =
+          "none";
+        document.getElementById("downloadAllBtn").style.display = "none"; // Ensure this specific button is hidden
+
+        if (!identifier) {
+          /* ... */
+          return;
+        }
+        try {
+          /* ... URL parsing logic ... */
+        } catch (e) {
+          /* ... */
+        }
+        if (!identifier) {
+          /* ... */
+          return;
+        }
+
+        currentFolderShareId = identifier;
+        setStatus(
+          `Loading contents for folder ID: ${currentFolderShareId}...`,
+          "info"
+        );
+
+        try {
+          const response = await fetch(
+            `/api/folder/list/${currentFolderShareId}`
+          );
+          if (!response.ok) {
+            /* ... error handling ... */
+            throw new Error(/* ... */);
+          }
+          const data = await response.json();
+
+          // Show folder specific buttons ONLY if data is loaded successfully
+          document.getElementById("folderLoadedActionButtons").style.display =
+            "flex";
+          // Hide initial input/paste buttons
+          document.getElementById("initialActionButtons").style.display =
+            "none";
+
+          if (data.files && data.files.length > 0) {
+            /* ... display files and download all button ... */
+            document.getElementById("fileListContainerOuter").style.display =
+              "block";
+            displayFileList(data.files);
+            document.getElementById("downloadAllBtn").style.display =
+              "inline-block";
+            setStatus(`Folder contents loaded successfully.`, "success");
+          } else {
+            /* ... handle empty or non-existent folder ... */
+            setStatus("This folder is empty or does not exist.", "info");
+            document.getElementById("fileListContainerOuter").innerHTML =
+              '<p style="text-align:center; padding:20px;">No files found in this shared folder.</p>';
+            document.getElementById("fileListContainerOuter").style.display =
+              "block";
+            document.getElementById("downloadAllBtn").style.display = "none";
+          }
+        } catch (error) {
+          /* ... error handling ... */
+          console.error("Error fetching folder list:", error);
+          setStatus(`Error: ${error.message}`, "error");
+          document.getElementById(
+            "fileListContainerOuter"
+          ).innerHTML = `<p style="text-align:center; padding:20px;">Could not load folder: ${error.message}</p>`;
+          document.getElementById("fileListContainerOuter").style.display =
+            "block";
+          // Ensure initial buttons remain visible on error, loaded actions hidden
+          document.getElementById("initialActionButtons").style.display =
+            "flex";
+          document.getElementById("folderLoadedActionButtons").style.display =
+            "none";
+        }
+      }
+
+      // ... (getFileIconClass, displayFileList, formatBytes, downloadAllAsZip functions remain the same as previous) ...
+      function getFileIconClass(fileName) {
+        const ext = fileName.split(".").pop().toLowerCase();
+        if (["jpg", "jpeg", "png", "gif", "bmp", "svg"].includes(ext))
+          return "fas fa-file-image";
+        if (["doc", "docx"].includes(ext)) return "fas fa-file-word";
+        if (["xls", "xlsx"].includes(ext)) return "fas fa-file-excel";
+        if (["pdf"].includes(ext)) return "fas fa-file-pdf";
+        if (["zip", "rar", "tar", "gz"].includes(ext))
+          return "fas fa-file-archive";
+        if (["txt", "md", "log"].includes(ext)) return "fas fa-file-alt";
+        if (["mp3", "wav", "ogg"].includes(ext)) return "fas fa-file-audio";
+        if (["mp4", "mov", "avi", "mkv"].includes(ext))
+          return "fas fa-file-video";
+        return "fas fa-file";
+      }
+
+      function displayFileList(files) {
+        const container = document.getElementById("fileListContainerOuter");
+        container.innerHTML = "";
+        const ul = document.createElement("ul");
+        files.forEach((file) => {
+          if (file.size === 0 && file.name.endsWith("/")) return;
+          const li = document.createElement("li");
+          const icon = document.createElement("i");
+          icon.className = `file-icon ${getFileIconClass(file.name)}`;
+          const fileNameSpan = document.createElement("span");
+          fileNameSpan.className = "file-name";
+          fileNameSpan.textContent = file.name;
+          fileNameSpan.title = file.name;
+          const fileSizeSpan = document.createElement("span");
+          fileSizeSpan.className = "file-size";
+          fileSizeSpan.textContent = formatBytes(file.size);
+          const downloadButton = document.createElement("button");
+          downloadButton.className = "btn btn-success download-btn";
+          downloadButton.innerHTML = '<i class="fas fa-download"></i>';
+          downloadButton.title = `Download ${file.name}`;
+          downloadButton.onclick = async (e) => {
+            e.preventDefault();
+            setStatus(`Preparing download for ${file.name}...`, "info");
+            try {
+              const encodedFilePath = encodeURIComponent(file.name);
+              const res = await fetch(
+                `/api/folder/file-link/${currentFolderShareId}/${encodedFilePath}`
+              );
+              const linkData = await res.json();
+              if (res.ok && linkData.url) {
+                const tempLink = document.createElement("a");
+                tempLink.href = linkData.url;
+                tempLink.download =
+                  linkData.fileName || file.name.split("/").pop();
+                document.body.appendChild(tempLink);
+                tempLink.click();
+                document.body.removeChild(tempLink);
+                setStatus(
+                  `${file.name.split("/").pop()} download started.`,
+                  "success"
+                );
+              } else {
+                setStatus(
+                  `Could not get link for ${file.name}: ${
+                    linkData.error || "Unknown error"
+                  }`,
+                  "error"
+                );
+              }
+            } catch (err) {
+              setStatus(
+                `Error downloading ${file.name}: ${err.message}`,
+                "error"
+              );
+            }
+          };
+          const fileInfoDiv = document.createElement("div");
+          fileInfoDiv.style.display = "flex";
+          fileInfoDiv.style.alignItems = "center";
+          fileInfoDiv.style.flexGrow = "1";
+          fileInfoDiv.appendChild(icon);
+          fileInfoDiv.appendChild(fileNameSpan);
+          li.appendChild(fileInfoDiv);
+          li.appendChild(fileSizeSpan);
+          li.appendChild(downloadButton);
+          ul.appendChild(li);
+        });
+        container.appendChild(ul);
+      }
+
+      function formatBytes(bytes, decimals = 2) {
+        if (bytes === 0) return "0 Bytes";
+        if (!bytes) return "-";
+        const k = 1024;
+        const dm = decimals < 0 ? 0 : decimals;
+        const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return (
+          parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i]
+        );
+      }
+
+      function downloadAllAsZip() {
+        if (currentFolderShareId) {
+          setStatus(
+            "Preparing ZIP download... this may take a moment.",
+            "info"
+          );
+          window.location.href = `/api/folder/download-zip/${currentFolderShareId}`;
+          setTimeout(() => {
+            if (
+              document
+                .getElementById("statusMessage")
+                .className.includes("info")
+            ) {
+              setStatus(
+                "If download hasn't started, check browser pop-up blocker or try again.",
+                "warning"
+              );
+            }
+          }, 10000);
+        } else {
+          setStatus("Folder ID is missing.", "error");
+        }
+      }
+    </script>
+    <!-- OLD SIMPLER FOOTER STRUCTURE -->
+    <footer class="app-footer">
+      <div class="footer-column">
+        <p>Made by <strong>Satyam Malviya</strong></p>
+        <a
+          href="https://www.linkedin.com/in/satyam-malviya-377920260"
+          target="_blank"
+          ><img
+            src="https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png"
+            alt="LinkedIn"
+        /></a>
+      </div>
+      <div class="footer-column">
+        <p><strong>Abhimanyu Nema</strong></p>
+        <a
+          href="https://www.linkedin.com/in/abhimanyu-nema-048477248"
+          target="_blank"
+          ><img
+            src="https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png"
+            alt="LinkedIn"
+        /></a>
+      </div>
+      <div class="footer-column">
+        <p>and <strong>Mehul Kumar Chawra</strong></p>
+        <a
+          href="https://www.linkedin.com/in/mehul-chawra-69295a258"
+          target="_blank"
+          ><img
+            src="https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png"
+            alt="LinkedIn"
+        /></a>
+      </div>
+    </footer>
+  </body>
+</html>

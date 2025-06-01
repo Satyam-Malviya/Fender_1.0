@@ -1,4 +1,8 @@
-/* Reset styles */
+/* public/style.css - Minimalist White Theme with Green Accents & Animations */
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Poppins:wght@400;500;600;700&display=swap');
+
+/* Reset and Base Styles */
 
 * {
     margin: 0;
@@ -6,256 +10,698 @@
     box-sizing: border-box;
 }
 
-
-/* Body styling */
-
 body {
-    font-family: 'Arial', sans-serif;
-    background: #f3f4f6;
-    /* Neutral background */
-    overflow: hidden;
-    /* Prevent scroll for bubbles */
+    font-family: 'Roboto', sans-serif;
+    background-color: #ffffff;
+    /* PURE WHITE BACKGROUND */
+    color: #384047;
+    /* Dark grey for text for better readability on white */
     display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
     flex-direction: column;
-    color: #333;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    overflow-x: hidden;
+    padding: 20px;
     position: relative;
-    /* For bubble positioning */
 }
 
-footer a {
-    color: #3498db;
-    /* Default icon color */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: 'Poppins', sans-serif;
+    color: #2d572c;
+    /* Darker green for headings */
+    margin-bottom: 0.8em;
+}
+
+p {
+    line-height: 1.65;
+    margin-bottom: 1.1em;
+    color: #5a6872;
+    /* Slightly lighter grey for paragraphs */
+}
+
+a {
+    color: #4CAF50;
     text-decoration: none;
-    /* No underline */
-    margin: 0 10px;
-    /* Space between icons */
-    transition: color 0.3s ease;
-    /* Smooth color transition */
+    transition: color 0.2s ease-out;
 }
 
-footer a:hover {
-    color: #2ecc71;
-    /* Change to green on hover */
+a:hover {
+    color: #3e8e41;
+    text-decoration: none;
+    /* Removing underline on hover for cleaner look, can be added back */
 }
 
 
-/* Bubble Animations */
-
-@keyframes float {
-    0% {
-        transform: translateY(0) scale(1);
-        opacity: 1;
-    }
-    50% {
-        transform: translateY(-50px) scale(1.1);
-        opacity: 0.8;
-    }
-    100% {
-        transform: translateY(0) scale(1);
-        opacity: 1;
-    }
-}
+/* Animated Bubbles - Subtle on White Background */
 
 .bubble {
     position: absolute;
     border-radius: 50%;
-    background: linear-gradient(45deg, #4CAF50, #2196F3);
-    /* Green & blue bubble gradient */
-    animation: float 8s infinite ease-in-out;
-    z-index: 1;
-    opacity: 0.6;
+    /* Using very light green and almost transparent for a ghostly effect */
+    background: linear-gradient(45deg, rgba(76, 175, 80, 0.08), rgba(129, 199, 132, 0.05));
+    /* OR: border-only bubbles */
+    /* background: transparent; */
+    /* border: 2px solid rgba(76, 175, 80, 0.1); */
+    animation: float-subtle 25s infinite ease-in-out alternate;
+    z-index: 0;
+    /* Just above body background, below content */
+    opacity: 0.7;
+    /* Further control opacity here */
 }
 
-
-/* Bubble sizes and positions */
+@keyframes float-subtle {
+    0% {
+        transform: translateY(30px) translateX(-15px) scale(0.85);
+        opacity: 0.5;
+    }
+    50% {
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateY(-30px) translateX(15px) scale(1.15);
+        opacity: 0.4;
+    }
+}
 
 .bubble:nth-child(1) {
-    width: 100px;
-    height: 100px;
-    top: 10%;
-    left: 15%;
-    animation-duration: 6s;
+    width: 90px;
+    height: 90px;
+    top: 12%;
+    left: 8%;
+    animation-duration: 20s;
+    animation-delay: -3s;
 }
 
 .bubble:nth-child(2) {
-    width: 120px;
-    height: 120px;
-    top: 30%;
-    left: 70%;
-    animation-duration: 8s;
+    width: 130px;
+    height: 130px;
+    top: 22%;
+    right: 12%;
+    animation-duration: 26s;
+    animation-delay: -6s;
 }
 
 .bubble:nth-child(3) {
-    width: 150px;
-    height: 150px;
-    bottom: 20%;
-    left: 50%;
-    animation-duration: 10s;
+    width: 60px;
+    height: 60px;
+    bottom: 18%;
+    left: 28%;
+    animation-duration: 18s;
+    animation-delay: -1s;
 }
 
 .bubble:nth-child(4) {
-    width: 80px;
-    height: 80px;
-    bottom: 10%;
-    right: 10%;
-    animation-duration: 12s;
+    width: 100px;
+    height: 100px;
+    bottom: 8%;
+    right: 28%;
+    animation-duration: 23s;
+    animation-delay: -4s;
 }
 
 
-/* Container styling */
+/* Main Container (Card Style on White) */
 
-.container {
-    position: relative;
-    background: rgba(255, 255, 255, 0.9);
-    /* Light background with slight transparency */
-    padding: 30px;
+.app-container {
+    background: #ffffff;
+    /* White container on white body */
+    padding: 35px 45px;
+    /* Increased padding */
     border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-    width: 350px;
-    max-width: 90%;
+    box-shadow: 0 8px 25px rgba(100, 100, 100, 0.1);
+    /* Softer, more spread out shadow */
+    width: 100%;
+    max-width: 500px;
+    /* Slightly smaller for a sleeker feel */
     text-align: center;
-    z-index: 10;
-    /* Above bubbles */
+    z-index: 1;
+    margin-bottom: 100px;
+    /* Increased space for new footer */
+    border-top: 4px solid #4CAF50;
+    /* Green accent remains */
+    animation: fadeInScaleUp 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+    opacity: 0;
 }
 
+@keyframes fadeInScaleUp {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
 
-/* Header styling */
-
-h1 {
-    font-size: 2.2rem;
-    margin-bottom: 15px;
+.app-container h1 {
+    font-size: 2.4rem;
     color: #4CAF50;
-    text-transform: uppercase;
-    font-weight: bold;
+    margin-bottom: 12px;
+    letter-spacing: -0.5px;
 }
 
-h6 {
+.app-container h6 {
     font-size: 1rem;
-    margin-bottom: 20px;
-    color: #555;
+    color: #778899;
+    /* Light Slate Gray for subtitle */
+    margin-bottom: 30px;
+    font-weight: 400;
 }
 
 
-/* Input styling */
+/* Form Elements Styling - Clean and Minimal */
 
 input[type="file"],
-input[type="text"] {
+input[type="text"],
+textarea {
     width: 100%;
-    padding: 12px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 1rem;
-    transition: 0.3s ease;
-    background: #f9f9f9;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    border: 1px solid #e0e0e0;
+    /* Lighter border */
+    border-radius: 6px;
+    font-size: 0.95rem;
+    /* Slightly smaller font */
+    font-family: 'Roboto', sans-serif;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+    background-color: #fdfdfd;
+    /* Almost white */
 }
 
-input[type="file"]:focus,
-input[type="text"]:focus {
+input[type="file"] {
+    padding: 9px;
+    /* Adjusted for file input appearance */
+}
+
+input[type="file"]::-webkit-file-upload-button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 9px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+input[type="file"]::-webkit-file-upload-button:hover {
+    background-color: #43a047;
+    /* Slightly different shade of green */
+    transform: translateY(-1px);
+}
+
+input[type="text"]:focus,
+textarea:focus {
     outline: none;
-    border-color: #4CAF50;
-    box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+    border-color: #66bb6a;
+    /* Lighter green for focus */
+    box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.15);
+    /* More subtle glow */
+}
+
+textarea {
+    resize: vertical;
+    min-height: 80px;
 }
 
 
-/* Button styling */
+/* Button Styling - Clean with depth */
 
-button {
+.btn {
     background-color: #4CAF50;
     color: #fff;
     border: none;
-    padding: 12px 24px;
+    padding: 12px 22px;
     cursor: pointer;
-    border-radius: 8px;
-    font-size: 1rem;
-    transition: 0.3s ease;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    /* Standardized button font size */
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+    /* Transition for all properties */
+    display: inline-flex;
+    /* For aligning icon and text */
+    align-items: center;
+    justify-content: center;
+    margin: 6px 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.16);
+    /* Subtle shadow */
 }
 
-button:hover {
-    background-color: #3e8e41;
+.btn i {
+    /* Icon inside button */
+    margin-right: 8px;
+    font-size: 1em;
+    /* Relative to button font size */
+}
+
+.btn:hover {
+    background-color: #43a047;
     transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(76, 175, 80, 0.15), 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn:active {
+    transform: translateY(0px);
+    background-color: #388e3c;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
 }
 
 
-/* Image Styling */
+/* Secondary Button - Outlined style */
 
-#pageImage {
-    width: 100px;
-    margin: 20px auto;
-    display: block;
-    z-index: 5;
-    opacity: 0.9;
+.btn-secondary {
+    background-color: #fff;
+    color: #4CAF50;
+    border: 1.5px solid #4CAF50;
+    box-shadow: none;
+}
+
+.btn-secondary:hover {
+    background-color: #f5fcf5;
+    /* Very light green tint */
+    color: #3e8e41;
+    border-color: #3e8e41;
+    box-shadow: 0 2px 5px rgba(76, 175, 80, 0.1);
+}
+
+.btn-secondary:active {
+    background-color: #e8f5e9;
+}
+
+.btn-success,
+.btn-danger,
+.btn-info {
+    /* Retain existing specific color buttons, icon example */
+    /* e.g. for success (if different from primary) */
+    /* background-color: #28a745; */
+    /* color: white; */
+    /* ... */
 }
 
 
-/* Info icon styling */
+/* Action Group for Buttons */
+
+.action-buttons {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+
+/* Progress Bar Styling - Minimal */
+
+.progress-bar-container {
+    width: 100%;
+    background-color: #f0f0f0;
+    border-radius: 6px;
+    padding: 3px;
+    margin: 18px 0;
+}
+
+.progress-bar {
+    height: 18px;
+    /* Thinner bar */
+    background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
+    background-color: #4CAF50;
+    /* Solid green for base */
+    background-size: 40px 40px;
+    /* Striped effect */
+    animation: progress-bar-stripes 1s linear infinite;
+    /* Animate stripes */
+    width: 0%;
+    border-radius: 4px;
+    text-align: center;
+    color: white;
+    font-weight: 500;
+    font-size: 0.8rem;
+    line-height: 18px;
+    transition: width 0.35s ease-in-out;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+@keyframes progress-bar-stripes {
+    from {
+        background-position: 40px 0;
+    }
+    to {
+        background-position: 0 0;
+    }
+}
+
+
+/* Status Messages Styling - Minimal */
+
+.status-message {
+    margin-top: 18px;
+    padding: 10px 15px;
+    border-radius: 6px;
+    font-weight: 500;
+    display: none;
+    animation: popIn 0.3s ease-out forwards;
+    text-align: left;
+    font-size: 0.9rem;
+}
+
+@keyframes popIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.status-message.success {
+    background-color: #e6f4ea;
+    color: #346a36;
+    border: 1px solid #cce8d0;
+}
+
+.status-message.error {
+    background-color: #fdecea;
+    color: #9e2b2f;
+    border: 1px solid #f9d6d7;
+}
+
+.status-message.info {
+    background-color: #e4f3fa;
+    color: #1b5b7e;
+    border: 1px solid #c5e3f1;
+}
+
+.status-message.warning {
+    background-color: #fff8e1;
+    color: #8d6e11;
+    border: 1px solid #ffecb3;
+}
+
+
+/* File Details / Share Link Section - Minimal */
+
+.file-details-box {
+    margin-top: 22px;
+    padding: 18px;
+    background-color: #f9f9f9;
+    /* Light grey box */
+    border-radius: 6px;
+    text-align: left;
+    border: 1px solid #eee;
+}
+
+.file-details-box p {
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.file-details-box textarea {
+    font-family: 'Menlo', 'Consolas', monospace;
+    font-size: 0.85rem;
+    background-color: #fff;
+    border-color: #ddd;
+}
+
+
+/* File List Styling - Clean & Light */
+
+.file-list-container {
+    margin-top: 22px;
+    padding: 0;
+    background-color: #fff;
+    border: 1px solid #ebebeb;
+    border-radius: 6px;
+    text-align: left;
+    max-height: 320px;
+    overflow-y: auto;
+}
+
+.file-list-container ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.file-list-container li {
+    padding: 10px 15px;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.15s ease, padding-left 0.15s ease;
+}
+
+.file-list-container li:last-child {
+    border-bottom: none;
+}
+
+.file-list-container li:hover {
+    background-color: #f7fff7;
+    padding-left: 20px;
+}
+
+
+/* Indent on hover */
+
+.file-list-container .file-icon {
+    margin-right: 10px;
+    color: #4CAF50;
+    font-size: 1.1rem;
+    width: 18px;
+    text-align: center;
+}
+
+.file-list-container .file-name {
+    flex-grow: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-right: 10px;
+    color: #444;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.file-list-container .file-size {
+    font-size: 0.8rem;
+    color: #888;
+    margin-right: 12px;
+    min-width: 65px;
+    text-align: right;
+}
+
+.file-list-container .download-btn {
+    font-size: 0.85rem;
+    padding: 6px 10px;
+}
+
+.file-list-container .download-btn i {
+    margin-right: 5px;
+    font-size: 0.9em;
+}
+
+
+/* Ensure icon smaller than button text */
+
+
+/* Info Icon & Box - Minimalist Touch */
 
 .info-container {
     position: fixed;
-    /* Fixes the position on the screen */
-    top: 20px;
-    /* Positions it 20px from the top */
-    right: 20px;
-    /* Positions it 20px from the right */
-    z-index: 1000;
-    /* Ensures it stays above other elements */
-    display: inline-block;
+    top: 15px;
+    right: 15px;
+    z-index: 100;
 }
 
 .info-icon {
-    font-size: 24px;
-    /* Makes the icon slightly larger */
+    font-size: 22px;
     color: #4CAF50;
-    /* Matches the theme color */
     cursor: pointer;
-    /* Indicates interactivity */
-    transition: color 0.3s ease, transform 0.3s ease;
+    padding: 5px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: all 0.25s ease-out;
 }
 
 .info-icon:hover {
-    color: #3e8e41;
-    /* Changes color on hover */
-    transform: scale(1.1);
-    /* Slightly enlarges the icon on hover */
+    color: #fff;
+    background-color: #3e8e41;
+    transform: rotate(360deg) scale(1.1);
 }
-
-
-/* Tooltip box styling */
 
 .info-box {
     visibility: hidden;
-    /* Hides the tooltip by default */
-    width: 250px;
-    /* Sets the tooltip width */
+    width: 270px;
     background-color: #fff;
-    /* White background for readability */
-    color: #333;
-    /* Dark text for contrast */
+    color: #444;
     text-align: left;
-    border-radius: 8px;
-    /* Rounded corners for the box */
-    padding: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    /* Adds a subtle shadow */
+    border-radius: 6px;
+    padding: 16px;
+    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.12);
     position: absolute;
-    top: 30px;
-    /* Positions the tooltip below the icon */
+    top: 40px;
     right: 0;
-    /* Aligns the tooltip to the right edge */
-    z-index: 1001;
-    /* Keeps the tooltip above all elements */
     opacity: 0;
-    /* Hidden by default */
-    transition: opacity 0.3s ease, visibility 0.3s ease;
-    /* Smooth fade-in */
+    transition: opacity 0.25s ease, transform 0.25s ease, visibility 0s linear 0.25s;
+    transform: translateY(-8px) scale(0.98);
 }
 
 .info-container:hover .info-box {
     visibility: visible;
-    /* Shows the tooltip on hover */
     opacity: 1;
-    /* Makes it fully visible */
+    transform: translateY(0) scale(1);
+    transition-delay: 0s;
+}
+
+.info-box p {
+    font-size: 0.88rem;
+    color: #555;
+}
+
+.info-box ul {
+    padding-left: 18px;
+    font-size: 0.88rem;
+    margin-top: 6px;
+    color: #555;
+}
+
+.info-box li {
+    margin-bottom: 5px;
+}
+
+
+/* Footer Styling - Modern and Clean */
+
+.app-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #fff;
+    /* White footer */
+    color: #5a6872;
+    /* Dark grey text */
+    padding: 15px 20px;
+    border-top: 1px solid #e7e7e7;
+    /* Subtle top border */
+    display: flex;
+    justify-content: space-between;
+    /* Space out "Made by" and "Powered by" */
+    align-items: center;
+    z-index: 50;
+    font-size: 0.85rem;
+}
+
+.app-footer .footer-credits,
+.app-footer .footer-tech {
+    display: flex;
+    align-items: center;
+}
+
+.app-footer .footer-credits p {
+    margin: 0 5px;
+}
+
+
+/* For multiple names if needed */
+
+.app-footer strong {
+    color: #4CAF50;
+}
+
+
+/* Green for names/tech */
+
+.app-footer a img {
+    /* LinkedIn icon etc. */
+    width: 20px;
+    height: auto;
+    opacity: 0.6;
+    margin-left: 8px;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.app-footer a:hover img {
+    opacity: 0.9;
+    transform: scale(1.05);
+}
+
+
+/* New section for "Powered by" or app name */
+
+.app-footer .footer-brand {
+    font-weight: 500;
+    color: #4CAF50;
+    /* Green for app name */
+}
+
+
+/* Responsive adjustments */
+
+@media (max-width: 768px) {
+    .app-container {
+        margin: 20px auto 100px;
+        padding: 25px 20px;
+        max-width: 90%;
+    }
+    .app-container h1 {
+        font-size: 2.1rem;
+    }
+    .action-buttons button.btn {
+        width: calc(50% - 8px);
+        font-size: 0.9rem;
+        padding: 10px 18px;
+    }
+    .app-footer {
+        font-size: 0.8rem;
+        padding: 12px 15px;
+        flex-direction: column;
+        text-align: center;
+    }
+    .app-footer .footer-credits,
+    .app-footer .footer-tech {
+        margin-bottom: 8px;
+    }
+    .app-footer .footer-credits:last-child,
+    .app-footer .footer-tech:last-child {
+        margin-bottom: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 10px;
+    }
+    .app-container {
+        padding: 20px 15px;
+    }
+    .app-container h1 {
+        font-size: 1.8rem;
+    }
+    .btn {
+        padding: 10px 15px;
+        font-size: 0.85rem;
+    }
+    .action-buttons button.btn {
+        width: 100%;
+    }
+    /* Adjust file list further for small screens if needed */
 }

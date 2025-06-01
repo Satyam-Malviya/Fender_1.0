@@ -1,32 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta
-      property="og:title"
-      content="Fender - Cloud-Based File Sharing System"
-    />
-    <meta
-      property="og:description"
-      content="Securely share and receive files with ease using Fender. Powered by AWS."
-    />
-    <meta property="og:image" content="https://fender-app.com/logo.png" />
-    <meta property="og:url" content="https://fender-app.com" />
-    <meta property="og:type" content="website" />
-
-    <meta
-      name="description"
-      content="Fender - A secure, cloud-based file-sharing system. Share and receive files with ease."
-    />
-    <meta
-      name="keywords"
-      content="file sharing, cloud storage, secure file sharing, Fender app"
-    />
-    <meta name="author" content="Satyam Malviya, Mehul Kumar Chawra" />
-    <meta name="robots" content="index, follow" />
-    <title>Fender | Share File</title>
-    <!-- Combined title -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Share File | Fender</title>
+    <!-- Add OG, meta, etc. from index.html -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Montserrat:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <link
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
       rel="stylesheet"
@@ -39,109 +21,128 @@
     <div class="bubble"></div>
     <div class="bubble"></div>
     <div class="bubble"></div>
-    <!-- AdSense script (fender-ad-hori) REMOVED -->
 
-    <div class="container">
-      <!-- AdSense Autorelaxed Ad block REMOVED -->
-
+    <div class="app-container">
       <h1>Share Your File</h1>
       <input type="file" id="fileUpload" />
-      <button onclick="uploadFile()">Upload</button>
-      <button onclick="window.location.href='/'">Back</button>
-      <p id="statusMessage"></p>
+
+      <div class="action-buttons">
+        <button class="btn" onclick="uploadFile()">
+          <i class="fas fa-cloud-upload-alt"></i> Upload
+        </button>
+        <button class="btn btn-secondary" onclick="window.location.href='/'">
+          <i class="fas fa-home"></i> Back
+        </button>
+      </div>
+
+      <div
+        id="statusMessage"
+        class="status-message"
+        style="display: none"
+      ></div>
+      <!-- JS will manage content and class (success/error/info) -->
 
       <div
         id="progressContainer"
-        style="display: none; width: 100%; background-color: #f3f3f3"
+        style="display: none"
+        class="progress-bar-container"
       >
-        <div
-          id="progressBar"
-          style="height: 20px; background-color: #4caf50; width: 0%"
-        ></div>
+        <div id="progressBar" class="progress-bar" style="width: 0%">0%</div>
       </div>
 
-      <div id="fileDetails" style="display: none">
+      <div id="fileDetails" style="display: none" class="file-details-box">
         <p>Share this link with the receiver:</p>
-        <textarea
-          id="shareableLink"
-          rows="3"
-          readonly
-          style="
-            width: 100%;
-            margin-top: 5px;
-            margin-bottom: 5px;
-            padding: 5px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-            resize: none;
-          "
-        ></textarea>
-        <button id="copyButton" onclick="copyShareableLink()">Copy Link</button>
+        <textarea id="shareableLink" rows="3" readonly></textarea>
+        <button
+          id="copyButton"
+          class="btn btn-success"
+          onclick="copyShareableLink()"
+          style="margin-top: 10px; width: 100%"
+        >
+          <i class="fas fa-copy"></i> Copy Link
+        </button>
       </div>
     </div>
 
     <script>
+      function setStatus(message, type = "info") {
+        // type can be 'success', 'error', 'info'
+        const statusElement = document.getElementById("statusMessage");
+        statusElement.textContent = message;
+        statusElement.className = `status-message ${type}`; // Reset classes
+        statusElement.style.display = message ? "block" : "none";
+      }
+
       function uploadFile() {
         const fileInput = document.getElementById("fileUpload");
         const file = fileInput.files[0];
         if (!file) {
-          alert("Please choose a file to upload");
+          setStatus("Please choose a file to upload", "error");
           return;
         }
-
-        const formData = new FormData();
-        formData.append("file", file);
-
+        setStatus("Uploading...", "info");
         document.getElementById("progressContainer").style.display = "block";
         document.getElementById("fileDetails").style.display = "none";
         const progressBar = document.getElementById("progressBar");
+        progressBar.style.width = "0%";
+        progressBar.textContent = "0%";
+
+        const formData = new FormData();
+        formData.append("file", file);
 
         const xhr = new XMLHttpRequest();
         xhr.open("POST", "/api/files/upload", true);
 
         xhr.upload.addEventListener("progress", function (e) {
           if (e.lengthComputable) {
-            const percent = (e.loaded / e.total) * 100;
+            const percent = Math.round((e.loaded / e.total) * 100);
             progressBar.style.width = percent + "%";
+            progressBar.textContent = percent + "%";
           }
         });
 
         xhr.onload = function () {
+          document.getElementById("progressContainer").style.display = "none";
           if (xhr.status === 200) {
             const response = JSON.parse(xhr.responseText);
             if (response.fileName) {
-              document.getElementById("statusMessage").innerText =
-                "File uploaded successfully!";
-
+              setStatus("File uploaded successfully!", "success");
               const shareLink = `${
                 window.location.origin
               }/receive?file=${encodeURIComponent(response.fileName)}`;
-
               const fileDetails = document.getElementById("fileDetails");
               fileDetails.style.display = "block";
-
-              const shareableLinkTextarea =
-                document.getElementById("shareableLink");
-              shareableLinkTextarea.value = shareLink;
+              document.getElementById("shareableLink").value = shareLink;
             } else {
-              document.getElementById("statusMessage").innerText =
-                "Failed to upload the file. Server did not return filename.";
+              setStatus(
+                response.error ||
+                  "Failed to upload the file. Server did not return filename.",
+                "error"
+              );
             }
           } else {
-            document.getElementById("statusMessage").innerText =
-              "Error uploading the file. Status: " + xhr.status;
+            try {
+              const errorResponse = JSON.parse(xhr.responseText);
+              setStatus(
+                errorResponse.error || `Error uploading. Status: ${xhr.status}`,
+                "error"
+              );
+            } catch (e) {
+              setStatus(
+                `Error uploading the file. Status: ${xhr.status}`,
+                "error"
+              );
+            }
           }
-          document.getElementById("progressContainer").style.display = "none";
-          progressBar.style.width = "0%";
         };
 
         xhr.onerror = function () {
-          document.getElementById("statusMessage").innerText =
-            "Network error occurred while uploading the file.";
           document.getElementById("progressContainer").style.display = "none";
-          progressBar.style.width = "0%";
+          setStatus(
+            "Network error occurred while uploading the file.",
+            "error"
+          );
         };
-
         xhr.send(formData);
       }
 
@@ -149,75 +150,49 @@
         const linkTextarea = document.getElementById("shareableLink");
         linkTextarea.select();
         linkTextarea.setSelectionRange(0, 99999);
-
         try {
           const successful = document.execCommand("copy");
           const msg = successful
             ? "Link copied to clipboard!"
             : "Failed to copy the link.";
-          alert(msg);
+          setStatus(msg, successful ? "success" : "error");
         } catch (err) {
-          alert("Oops, unable to copy the link. Please copy it manually.");
+          setStatus("Oops, unable to copy. Please copy manually.", "error");
         }
       }
     </script>
-    <div
-      style="
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        background-color: #f3f3f3;
-        padding: 20px;
-        border-top: 1px solid #ddd;
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-        z-index: 10;
-      "
-    >
-      <div style="text-align: center; margin: 10px">
+    <footer class="app-footer">
+      <!-- Footer content from index.html -->
+      <div class="footer-column">
         <p>Made by <strong>Satyam Malviya</strong></p>
         <a
           href="https://www.linkedin.com/in/satyam-malviya-377920260"
           target="_blank"
-          style="display: inline-block; margin-top: 5px"
-        >
-          <img
+          ><img
             src="https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png"
             alt="LinkedIn"
-            style="width: 24px; height: auto"
-          />
-        </a>
+        /></a>
       </div>
-      <div style="text-align: center; margin: 10px">
+      <div class="footer-column">
         <p><strong>Abhimanyu Nema</strong></p>
         <a
           href="https://www.linkedin.com/in/abhimanyu-nema-048477248"
           target="_blank"
-          style="display: inline-block; margin-top: 5px"
-        >
-          <img
+          ><img
             src="https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png"
             alt="LinkedIn"
-            style="width: 24px; height: auto"
-          />
-        </a>
+        /></a>
       </div>
-      <div style="text-align: center; margin: 10px">
+      <div class="footer-column">
         <p>and <strong>Mehul Kumar Chawra</strong></p>
         <a
           href="https://www.linkedin.com/in/mehul-chawra-69295a258"
           target="_blank"
-          style="display: inline-block; margin-top: 5px"
-        >
-          <img
+          ><img
             src="https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png"
             alt="LinkedIn"
-            style="width: 24px; height: auto"
-          />
-        </a>
+        /></a>
       </div>
-    </div>
+    </footer>
   </body>
 </html>

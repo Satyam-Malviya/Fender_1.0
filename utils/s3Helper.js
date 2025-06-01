@@ -1,40 +1,163 @@
 const AWS = require('aws-sdk');
+const archiver = require('archiver');
+
+// Attempt to load from .env (dotenv should be called in app.js)
+const S3_BUCKET_NAME = process.env.S3_BUCKET_NAME || "fender-bkt"; // Fallback if not in .env
 
 const s3 = new AWS.S3({
-    accessKeyId: "AKIAZDSDULQLESYD23XP",
-    secretAccessKey: "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",
-    region: "ap-south-1",
+    // These will be picked up from environment variables if set:
+    // AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION
+    // Forcing your hardcoded values for your testing, BUT STRONGLY ADVISE AGAINST THIS FOR DEPLOYMENT
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID || "AKIAZDSDULQLESYD23XP", // REMOVE FOR PRODUCTION
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || "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", // REMOVE FOR PRODUCTION
+    region: process.env.AWS_REGION || "ap-south-1",
 });
 
-
-const uploadFile = async(file) => {
+// For single file uploads (original functionality)
+const uploadFile = async(fileObject) => { // Expects multer file object
     const params = {
-        Bucket: "fender-bkt",
-        Key: file.originalname,
-        Body: file.buffer,
-        ContentType: file.mimetype,
+        Bucket: S3_BUCKET_NAME,
+        Key: fileObject.originalname, // Using original filename as key
+        Body: fileObject.buffer,
+        ContentType: fileObject.mimetype,
+    };
+    try {
+        const result = await s3.upload(params).promise();
+        return result; // { ETag, Location, Key, Bucket }
+    } catch (error) {
+        console.error("S3 Single File Upload Error:", error);
+        throw new Error(`S3 Upload Error: ${error.message}`);
+    }
+};
+
+// For uploading files as part of a folder (key is pre-determined)
+const uploadFileToFolder = async(fileObject, s3Key) => {
+    const params = {
+        Bucket: S3_BUCKET_NAME,
+        Key: s3Key, // e.g., "folderShareId/path/to/file.ext"
+        Body: fileObject.buffer,
+        ContentType: fileObject.mimetype,
+        Metadata: { // Store original filename if needed, though s3Key here is usually the relative path
+            'original-filename': fileObject.originalname
+        }
     };
     try {
         const result = await s3.upload(params).promise();
         return result;
     } catch (error) {
-        throw new Error(error.message);
+        console.error("S3 Upload to Folder Error:", error);
+        throw new Error(`S3 Folder Upload Error: ${error.message}`);
     }
 };
 
-
-const generateSignedUrl = async(fileName) => {
+// Generates a pre-signed URL for downloading an object (single file or file within a folder)
+const generateSignedUrl = async(s3ObjectKey) => {
     const params = {
-        Bucket: "fender-bkt",
-        Key: fileName,
-        Expires: 60 * 5,
+        Bucket: S3_BUCKET_NAME,
+        Key: s3ObjectKey,
+        Expires: 60 * 15, // 15 minutes expiry for the link
     };
+    // To ensure the file downloads with a nice name rather than just the key (if key is UUID etc.)
+    // params.ResponseContentDisposition = `attachment; filename="${s3ObjectKey.split('/').pop()}"`;
+
     try {
         const url = await s3.getSignedUrlPromise('getObject', params);
         return url;
     } catch (error) {
-        throw new Error(error.message);
+        console.error("S3 Signed URL Generation Error for key:", s3ObjectKey, error);
+        // Let the caller handle specific error types like NoSuchKey
+        throw error; // Re-throw the error to be caught by the route handler
     }
 };
 
-module.exports = { uploadFile, generateSignedUrl };
+// Lists files within a "folder" (S3 prefix)
+const listFilesFromFolder = async(folderShareId) => {
+    const params = {
+        Bucket: S3_BUCKET_NAME,
+        Prefix: `${folderShareId}/`
+    };
+    try {
+        const data = await s3.listObjectsV2(params).promise();
+        if (!data.Contents) {
+            return [];
+        }
+        return data.Contents.map(item => {
+            // Remove the folderShareId/ prefix to get the name relative to the shared folder root
+            let relativeName = item.Key.substring(folderShareId.length + 1);
+            // Don't list "folders" themselves if they are empty S3 objects ending with /
+            if (item.Size === 0 && relativeName.endsWith('/')) {
+                return null;
+            }
+            return {
+                key: item.Key, // Full S3 key
+                name: relativeName, // Relative path inside the shared folder
+                size: item.Size,
+                lastModified: item.LastModified
+            };
+        }).filter(item => item !== null); // Filter out nulls (empty S3 folder objects)
+    } catch (error) {
+        console.error("S3 List Files from Folder Error:", error);
+        throw new Error(`S3 List Files Error: ${error.message}`);
+    }
+};
+
+// Streams a folder from S3 as a ZIP file
+const getZippedFolderStream = async(folderShareId) => {
+    const archive = archiver('zip', { zlib: { level: 6 } }); // level 6 is a good balance
+
+    archive.on('warning', (err) => {
+        if (err.code === 'ENOENT') { console.warn('Archiver ENOENT warning: ', err); } else { console.error('Archiver warning: ', err);
+            archive.emit('error', err); } // Propagate other warnings as errors
+    });
+    // Error event on archiver is critical
+    archive.on('error', (err) => {
+        console.error('Archiver stream has errored:', err);
+        // The stream piping to response in the route will handle this.
+    });
+
+    // Fetch file list first
+    let s3Files;
+    try {
+        s3Files = await listFilesFromFolder(folderShareId);
+    } catch (error) {
+        console.error(`Failed to list files for ZIP for folder ${folderShareId}:`, error);
+        archive.emit('error', new Error(`Could not list files for zipping: ${error.message}`));
+        archive.finalize(); // Finalize even on error to close the archive stream properly
+        return archive;
+    }
+
+    if (!s3Files || s3Files.length === 0) {
+        console.log(`No files found for folderShareId: ${folderShareId}. ZIP will be empty or contain only structure.`);
+        // It's important to finalize even if there are no files.
+        archive.finalize();
+        return archive;
+    }
+
+    // Append files to the archive
+    for (const file of s3Files) {
+        if (file.size > 0) { // Only add actual files, not S3 "folder" markers
+            const s3Stream = s3.getObject({ Bucket: S3_BUCKET_NAME, Key: file.key }).createReadStream();
+            s3Stream.on('error', (streamError) => {
+                console.error(`Error streaming S3 object ${file.key} for ZIP:`, streamError);
+                // archive.emit('error', streamError); // This tells archiver to stop & report error
+                // For robustness, might choose to skip problematic file & log, or abort.
+                // Emitting error is usually correct.
+                if (!archive.destroyed) {
+                    archive.emit('error', new Error(`Failed to stream ${file.name} from S3.`));
+                }
+            });
+            archive.append(s3Stream, { name: file.name }); // file.name is the relative path within zip
+        }
+    }
+
+    archive.finalize(); // Finalize the archive, no more files will be appended.
+    return archive; // Return the stream to be piped in the route.
+};
+
+module.exports = {
+    uploadFile,
+    generateSignedUrl,
+    uploadFileToFolder,
+    listFilesFromFolder,
+    getZippedFolderStream
+};

@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <!-- AdSense script (client=ca-pub-5859546663641134) REMOVED -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       property="og:title"
       content="Fender - Cloud-Based File Sharing System"
@@ -13,7 +14,6 @@
     <meta property="og:image" content="https://fender-app.com/logo.png" />
     <meta property="og:url" content="https://fender-app.com" />
     <meta property="og:type" content="website" />
-
     <meta
       name="description"
       content="Fender - A secure, cloud-based file-sharing system. Share and receive files with ease."
@@ -22,12 +22,16 @@
       name="keywords"
       content="file sharing, cloud storage, secure file sharing, Fender app"
     />
-    <meta name="author" content="Satyam Malviya, Mehul Kumar Chawra" />
+    <meta
+      name="author"
+      content="Satyam Malviya, Mehul Kumar Chawra, Abhimanyu Nema"
+    />
     <meta name="robots" content="index, follow" />
     <title>Fender | Cloud-Based File Sharing System</title>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- Redundant title tag removed -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Montserrat:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <link
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
       rel="stylesheet"
@@ -40,87 +44,79 @@
     <div class="bubble"></div>
     <div class="bubble"></div>
     <div class="bubble"></div>
-    <!-- AdSense Ad block (fender-ad-hori) REMOVED -->
-    <!-- AdSense Autorelaxed Ad block REMOVED -->
 
-    <div class="container">
+    <div class="app-container">
       <h1>Fender</h1>
-      <h6>AWS Based File Sharing System</h6>
-      <button onclick="window.location.href='/share'">Share a File</button>
-      <button onclick="window.location.href='/receive'">Receive a File</button>
+      <h6>Secure AWS Based File Sharing</h6>
+      <div class="action-buttons">
+        <button class="btn" onclick="window.location.href='/share'">
+          <i class="fas fa-upload"></i> Share File
+        </button>
+        <button class="btn" onclick="window.location.href='/share-folder'">
+          <i class="fas fa-folder-plus"></i> Share Folder
+        </button>
+        <button
+          class="btn btn-secondary"
+          onclick="window.location.href='/receive'"
+        >
+          <i class="fas fa-download"></i> Receive File
+        </button>
+        <button
+          class="btn btn-secondary"
+          onclick="window.location.href='/receive-folder'"
+        >
+          <i class="fas fa-folder-open"></i> Receive Folder
+        </button>
+      </div>
     </div>
+
     <div class="info-container">
       <i class="fas fa-info-circle info-icon"></i>
       <div class="info-box">
         <p><strong>How Fender Works:</strong></p>
         <ul>
+          <li>To share, click "Share File" or "Share Folder" and upload.</li>
+          <li>You will receive a unique link to share.</li>
           <li>
-            To share a file, click on "Share a File" and upload your document.
+            To receive, click "Receive File" or "Receive Folder" and enter the
+            link/ID.
           </li>
-          <li>You will receive a unique link to share with others.</li>
-          <li>To receive a file, click "Receive a File" and enter the link.</li>
           <li>Files are securely stored and transferred via AWS S3.</li>
         </ul>
       </div>
     </div>
 
-    <div
-      style="
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        background-color: #f3f3f3;
-        padding: 20px;
-        border-top: 1px solid #ddd;
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-        z-index: 10;
-      "
-    >
-      <div style="text-align: center; margin: 10px">
+    <footer class="app-footer">
+      <div class="footer-column">
         <p>Made by <strong>Satyam Malviya</strong></p>
         <a
           href="https://www.linkedin.com/in/satyam-malviya-377920260"
           target="_blank"
-          style="display: inline-block; margin-top: 5px"
-        >
-          <img
+          ><img
             src="https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png"
             alt="LinkedIn"
-            style="width: 24px; height: auto"
-          />
-        </a>
+        /></a>
       </div>
-      <div style="text-align: center; margin: 10px">
+      <div class="footer-column">
         <p><strong>Abhimanyu Nema</strong></p>
         <a
           href="https://www.linkedin.com/in/abhimanyu-nema-048477248"
           target="_blank"
-          style="display: inline-block; margin-top: 5px"
-        >
-          <img
+          ><img
             src="https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png"
             alt="LinkedIn"
-            style="width: 24px; height: auto"
-          />
-        </a>
+        /></a>
       </div>
-      <div style="text-align: center; margin: 10px">
+      <div class="footer-column">
         <p>and <strong>Mehul Kumar Chawra</strong></p>
         <a
           href="https://www.linkedin.com/in/mehul-chawra-69295a258"
           target="_blank"
-          style="display: inline-block; margin-top: 5px"
-        >
-          <img
+          ><img
             src="https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png"
             alt="LinkedIn"
-            style="width: 24px; height: auto"
-          />
-        </a>
+        /></a>
       </div>
-    </div>
+    </footer>
   </body>
 </html>

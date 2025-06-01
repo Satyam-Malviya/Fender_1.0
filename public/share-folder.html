@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Share Folder | Fender</title>
+    <!-- Add OG, meta, etc. from index.html -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Montserrat:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+
+    <div class="app-container">
+      <h1>Share Your Folder</h1>
+      <input
+        type="file"
+        id="folderUploadInput"
+        webkitdirectory
+        directory
+        multiple
+        style="display: none"
+        onchange="handleFolderSelect(this.files)"
+      />
+
+      <div class="action-buttons">
+        <button
+          class="btn"
+          onclick="document.getElementById('folderUploadInput').click()"
+        >
+          <i class="fas fa-folder-plus"></i> Select Folder
+        </button>
+        <button class="btn btn-secondary" onclick="window.location.href='/'">
+          <i class="fas fa-home"></i> Back to Home
+        </button>
+      </div>
+
+      <div
+        id="statusMessage"
+        class="status-message"
+        style="display: none; margin-top: 15px"
+      ></div>
+
+      <div id="uploadProgressContainer" style="display: none; margin-top: 15px">
+        <p style="font-size: 0.9rem; color: #555">
+          Current file:
+          <span id="currentFileName" style="font-weight: 500">-</span>
+        </p>
+        <p style="font-size: 0.9rem; color: #555">
+          <span id="filesUploadedCount">0</span> /
+          <span id="totalFilesCount">0</span> files processed.
+        </p>
+        <div class="progress-bar-container">
+          <div id="overallProgressBar" class="progress-bar" style="width: 0%">
+            0%
+          </div>
+        </div>
+      </div>
+
+      <div
+        id="folderShareLinkContainer"
+        style="display: none; margin-top: 15px"
+        class="file-details-box"
+      >
+        <p>Folder share link (share this with the receiver):</p>
+        <textarea id="folderShareLink" rows="2" readonly></textarea>
+        <button
+          class="btn btn-success"
+          onclick="copyFolderShareLink()"
+          style="margin-top: 10px; width: 100%"
+        >
+          <i class="fas fa-copy"></i> Copy Link
+        </button>
+      </div>
+    </div>
+
+    <script>
+      let folderShareIdGlobal = null;
+
+      function setStatus(message, type = "info") {
+        const statusElement = document.getElementById("statusMessage");
+        statusElement.textContent = message;
+        statusElement.className = `status-message ${type}`;
+        statusElement.style.display = message ? "block" : "none";
+      }
+
+      function generateUUID() {
+        return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
+          /[xy]/g,
+          function (c) {
+            var r = (Math.random() * 16) | 0,
+              v = c == "x" ? r : (r & 0x3) | 0x8;
+            return v.toString(16);
+          }
+        );
+      }
+
+      async function handleFolderSelect(files) {
+        if (files.length === 0) {
+          setStatus("No folder selected or folder is empty.", "error");
+          return;
+        }
+
+        folderShareIdGlobal = generateUUID();
+        setStatus("Preparing to upload...", "info");
+        document.getElementById("uploadProgressContainer").style.display =
+          "block";
+        document.getElementById("folderShareLinkContainer").style.display =
+          "none";
+        document.getElementById("totalFilesCount").textContent = files.length;
+        document.getElementById("filesUploadedCount").textContent = 0;
+        const overallProgressBar =
+          document.getElementById("overallProgressBar");
+        overallProgressBar.style.width = "0%";
+        overallProgressBar.textContent = "0%";
+
+        let filesSuccessfullyUploaded = 0;
+
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
+          const relativePath = file.webkitRelativePath || file.name;
+          document.getElementById("currentFileName").textContent = relativePath;
+          setStatus(`Uploading ${relativePath}...`, "info");
+
+          const formData = new FormData();
+          formData.append("file", file);
+          formData.append("folderShareId", folderShareIdGlobal);
+          formData.append("relativePath", relativePath);
+
+          try {
+            const response = await fetch("/api/folder/upload-file", {
+              method: "POST",
+              body: formData,
+            });
+            if (!response.ok) {
+              const errorData = await response.json().catch(() => ({
+                message: "Upload error, server response unreadable.",
+              }));
+              console.error(
+                `Upload failed for ${relativePath}: ${response.status}`,
+                errorData
+              );
+              setStatus(
+                `Error uploading ${relativePath}. Proceeding with others.`,
+                "error"
+              );
+            } else {
+              filesSuccessfullyUploaded++;
+            }
+          } catch (error) {
+            console.error(
+              `Network error during upload of ${relativePath}:`,
+              error
+            );
+            setStatus(
+              `Network error uploading ${relativePath}. Proceeding.`,
+              "error"
+            );
+          }
+          document.getElementById("filesUploadedCount").textContent = i + 1;
+          let percentComplete = Math.round(((i + 1) / files.length) * 100);
+          overallProgressBar.style.width = percentComplete + "%";
+          overallProgressBar.textContent = percentComplete + "%";
+        }
+
+        document.getElementById("uploadProgressContainer").style.display =
+          "none";
+        document.getElementById("currentFileName").textContent = "-";
+
+        if (filesSuccessfullyUploaded > 0) {
+          const shareLink = `${window.location.origin}/receive-folder?id=${folderShareIdGlobal}`;
+          document.getElementById("folderShareLink").value = shareLink;
+          document.getElementById("folderShareLinkContainer").style.display =
+            "block";
+          if (filesSuccessfullyUploaded === files.length) {
+            setStatus("Folder contents uploaded successfully!", "success");
+          } else {
+            setStatus(
+              `Upload complete. ${filesSuccessfullyUploaded} of ${files.length} files successful.`,
+              "warning"
+            );
+          }
+        } else {
+          setStatus("Folder upload failed. No files were uploaded.", "error");
+        }
+      }
+
+      function copyFolderShareLink() {
+        const linkTextarea = document.getElementById("folderShareLink");
+        linkTextarea.select();
+        linkTextarea.setSelectionRange(0, 99999);
+        try {
+          document.execCommand("copy");
+          setStatus("Folder share link copied!", "success");
+        } catch (err) {
+          setStatus("Failed to copy. Please copy manually.", "error");
+        }
+      }
+    </script>
+    <footer class="app-footer">
+      <!-- Footer content from index.html -->
+      <div class="footer-column">
+        <p>Made by <strong>Satyam Malviya</strong></p>
+        <a
+          href="https://www.linkedin.com/in/satyam-malviya-377920260"
+          target="_blank"
+          ><img
+            src="https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png"
+            alt="LinkedIn"
+        /></a>
+      </div>
+      <div class="footer-column">
+        <p><strong>Abhimanyu Nema</strong></p>
+        <a
+          href="https://www.linkedin.com/in/abhimanyu-nema-048477248"
+          target="_blank"
+          ><img
+            src="https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png"
+            alt="LinkedIn"
+        /></a>
+      </div>
+      <div class="footer-column">
+        <p>and <strong>Mehul Kumar Chawra</strong></p>
+        <a
+          href="https://www.linkedin.com/in/mehul-chawra-69295a258"
+          target="_blank"
+          ><img
+            src="https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png"
+            alt="LinkedIn"
+        /></a>
+      </div>
+    </footer>
+  </body>
+</html>
