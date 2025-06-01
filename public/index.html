@@ -27,6 +27,8 @@
       content="Satyam Malviya, Mehul Kumar Chawra, Abhimanyu Nema"
     />
     <meta name="robots" content="index, follow" />
+    <!-- Agar aapne Google site verification HTML tag method use kiya tha, toh woh yahan hoga -->
+    <!-- e.g., <meta name="google-site-verification" content="YOUR_UNIQUE_STRING_HERE" /> -->
     <title>Fender | Cloud-Based File Sharing System</title>
     <link
       href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Montserrat:wght@400;500;600;700&display=swap"
@@ -37,6 +39,8 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="style.css" />
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+    <!-- Favicon link (optional) -->
   </head>
 
   <body>
@@ -48,6 +52,23 @@
     <div class="app-container">
       <h1>Fender</h1>
       <h6>Secure AWS Based File Sharing</h6>
+
+      <!-- NEW DESCRIPTIVE PARAGRAPH START -->
+      <p
+        style="
+          font-size: 0.9rem;
+          color: #5a6872;
+          margin-bottom: 25px;
+          line-height: 1.5;
+        "
+      >
+        Welcome to Fender, a demonstration project showcasing a simple and
+        secure cloud-based file sharing system. Easily share your files and
+        folders, or receive them from others. This service is intended for
+        educational and portfolio purposes.
+      </p>
+      <!-- NEW DESCRIPTIVE PARAGRAPH END -->
+
       <div class="action-buttons">
         <button class="btn" onclick="window.location.href='/share'">
           <i class="fas fa-upload"></i> Share File
@@ -76,7 +97,7 @@
         <p><strong>How Fender Works:</strong></p>
         <ul>
           <li>To share, click "Share File" or "Share Folder" and upload.</li>
-          <li>You will receive a unique link to share.</li>
+          <li>You will receive a unique link/ID to share.</li>
           <li>
             To receive, click "Receive File" or "Receive Folder" and enter the
             link/ID.
