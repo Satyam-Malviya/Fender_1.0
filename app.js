@@ -1,10 +1,11 @@
 const express = require('express');
 const dotenv = require('dotenv');
+dotenv.config(); // Load .env file variables
 const path = require('path');
 const fileRoutes = require('./routes/fileRoutes');
 const folderRoutes = require('./routes/folderRoutes'); // NEW
 
-dotenv.config(); // Load .env file variables
+
 const app = express();
 
 // Serve static files from 'public' directory

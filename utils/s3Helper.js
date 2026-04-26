@@ -1,17 +1,16 @@
 const AWS = require('aws-sdk');
 const archiver = require('archiver');
 
-// Attempt to load from .env (dotenv should be called in app.js)
-const S3_BUCKET_NAME = process.env.S3_BUCKET_NAME || "fender-bkt"; // Fallback if not in .env
+// Ab hum strictly .env file par depend karenge
+const S3_BUCKET_NAME = process.env.S3_BUCKET_NAME;
 
 const s3 = new AWS.S3({
-    // These will be picked up from environment variables if set:
-    // AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION
-    // Forcing your hardcoded values for your testing, BUT STRONGLY ADVISE AGAINST THIS FOR DEPLOYMENT
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID || "AKIAZDSDULQLESYD23XP", // REMOVE FOR PRODUCTION
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || "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", // REMOVE FOR PRODUCTION
-    region: process.env.AWS_REGION || "ap-south-1",
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    region: process.env.AWS_REGION
 });
+
+// ... baaki niche ka tumhara saara code waisa hi rahega (uploadFile, generateSignedUrl etc.)
 
 // For single file uploads (original functionality)
 const uploadFile = async(fileObject) => { // Expects multer file object
