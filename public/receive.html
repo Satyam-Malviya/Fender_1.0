@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Receive File | Fender</title>
-    <!-- Add OG, meta, etc. from index.html -->
+    
     <link
       href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Montserrat:wght@400;500;600;700&display=swap"
       rel="stylesheet"
@@ -48,7 +48,7 @@
         style="display: none"
       ></div>
       <div id="filePreview" style="margin-top: 15px"></div>
-      <!-- Content populated by JS -->
+      
     </div>
 
     <script>
@@ -58,8 +58,7 @@
         statusElement.className = `status-message ${type}`;
         statusElement.style.display = message ? "block" : "none";
         if (type === "error") {
-          document.getElementById("filePreview").innerHTML = ""; // Clear preview on error
-        }
+          document.getElementById("filePreview").innerHTML = ""; 
       }
 
       window.onload = function () {
@@ -94,11 +93,11 @@
           return;
         }
         setStatus("Fetching file...", "info");
-        document.getElementById("filePreview").innerHTML = ""; // Clear previous
+        document.getElementById("filePreview").innerHTML = ""; 
 
         let actualFileName = userInput;
         try {
-          // Try to parse as URL to extract filename if it's one of our links
+          
           const url = new URL(userInput);
           if (
             (url.origin === window.location.origin ||
@@ -110,7 +109,7 @@
             actualFileName = decodeURIComponent(url.searchParams.get("file"));
           }
         } catch (e) {
-          /* Not our specific URL format, or not a URL at all; treat as filename */
+          
         }
 
         if (!actualFileName) {
@@ -118,7 +117,7 @@
           return;
         }
 
-        // Encode for the API call as it goes into the URL path
+        
         fetch(`/api/files/share/${encodeURIComponent(actualFileName)}`)
           .then(async (response) => {
             if (!response.ok) {
@@ -145,7 +144,7 @@
                 "success"
               );
               const filePreview = document.getElementById("filePreview");
-              // Sanitize data.url just in case, though it's from our backend
+            
               const safeUrl = data.url.startsWith("http") ? data.url : "#";
               const decodedFileNameForDisplay =
                 decodeURIComponent(actualFileName); // Show original name nicely
@@ -180,9 +179,9 @@
       </div>
       
       <div class="footer-column">
-        <p>and <strong>Mehul Kumar Chawra</strong></p>
+        <p>and <strong>Khushi Rathore</strong></p>
         <a
-          href="https://www.linkedin.com/in/mehul-chawra-69295a258"
+          href="https://www.linkedin.com/in/khushi-rathore-1841a4253"
           target="_blank"
           ><img
             src="https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png"

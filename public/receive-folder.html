@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Receive Folder | Fender</title>
-    <!-- Meta tags and links (Font Awesome, Google Fonts, style.css) as before -->
+    
     <link
       href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Poppins:wght@400;500;600;700&display=swap"
       rel="stylesheet"
@@ -43,7 +43,7 @@
         <button class="btn btn-secondary" onclick="window.location.href='/'">
           <i class="fas fa-home"></i> Back to Home
         </button>
-        <!-- BACK BUTTON HERE -->
+        
       </div>
 
       <div
@@ -54,7 +54,7 @@
         Enter a folder link or ID to retrieve its contents.
       </div>
 
-      <!-- This container will hold buttons that are relevant AFTER folder is loaded -->
+      
       <div
         id="folderLoadedActionButtons"
         class="action-buttons"
@@ -67,15 +67,14 @@
         >
           <i class="fas fa-file-archive"></i> Download All as ZIP
         </button>
-        <!-- "Back to Home" is now in initial actions, but could be duplicated here if preferred -->
-      </div>
+        
 
       <div
         id="fileListContainerOuter"
         class="file-list-container"
         style="display: none"
       >
-        <!-- File list ul will be appended here by JS -->
+        
       </div>
     </div>
 
@@ -83,7 +82,7 @@
       let currentFolderShareId = "";
 
       function setStatus(message, type = "info") {
-        // ... (setStatus function remains the same as the previous version) ...
+        
         const statusElement = document.getElementById("statusMessage");
         statusElement.textContent = message;
         statusElement.className = `status-message ${type}`;
@@ -91,7 +90,7 @@
       }
 
       window.onload = async () => {
-        // ... (window.onload logic remains the same, including auto-processing if ID in URL) ...
+        
         const urlParams = new URLSearchParams(window.location.search);
         const folderIdFromUrl = urlParams.get("id");
         if (folderIdFromUrl) {
@@ -107,7 +106,7 @@
       };
 
       function pasteFolderIdentifier() {
-        // ... (pasteFolderIdentifier function remains the same) ...
+        
         navigator.clipboard
           .readText()
           .then((text) => {
@@ -121,7 +120,7 @@
       }
 
       async function processFolderIdentifier(idFromUrl = null) {
-        // ... (logic for extracting identifier and calling API remains the same) ...
+        
         let identifier = idFromUrl
           ? idFromUrl.trim()
           : document.getElementById("folderIdentifierInput").value.trim();
@@ -130,19 +129,19 @@
         document.getElementById("fileListContainerOuter").innerHTML = "";
         document.getElementById("folderLoadedActionButtons").style.display =
           "none";
-        document.getElementById("downloadAllBtn").style.display = "none"; // Ensure this specific button is hidden
+        document.getElementById("downloadAllBtn").style.display = "none"; 
 
         if (!identifier) {
-          /* ... */
+          
           return;
         }
         try {
           /* ... URL parsing logic ... */
         } catch (e) {
-          /* ... */
+          
         }
         if (!identifier) {
-          /* ... */
+          
           return;
         }
 
@@ -157,20 +156,20 @@
             `/api/folder/list/${currentFolderShareId}`
           );
           if (!response.ok) {
-            /* ... error handling ... */
+            
             throw new Error(/* ... */);
           }
           const data = await response.json();
 
-          // Show folder specific buttons ONLY if data is loaded successfully
+          
           document.getElementById("folderLoadedActionButtons").style.display =
             "flex";
-          // Hide initial input/paste buttons
+          
           document.getElementById("initialActionButtons").style.display =
             "none";
 
           if (data.files && data.files.length > 0) {
-            /* ... display files and download all button ... */
+            
             document.getElementById("fileListContainerOuter").style.display =
               "block";
             displayFileList(data.files);
@@ -178,7 +177,7 @@
               "inline-block";
             setStatus(`Folder contents loaded successfully.`, "success");
           } else {
-            /* ... handle empty or non-existent folder ... */
+            
             setStatus("This folder is empty or does not exist.", "info");
             document.getElementById("fileListContainerOuter").innerHTML =
               '<p style="text-align:center; padding:20px;">No files found in this shared folder.</p>';
@@ -187,7 +186,7 @@
             document.getElementById("downloadAllBtn").style.display = "none";
           }
         } catch (error) {
-          /* ... error handling ... */
+          
           console.error("Error fetching folder list:", error);
           setStatus(`Error: ${error.message}`, "error");
           document.getElementById(
@@ -195,7 +194,7 @@
           ).innerHTML = `<p style="text-align:center; padding:20px;">Could not load folder: ${error.message}</p>`;
           document.getElementById("fileListContainerOuter").style.display =
             "block";
-          // Ensure initial buttons remain visible on error, loaded actions hidden
+          
           document.getElementById("initialActionButtons").style.display =
             "flex";
           document.getElementById("folderLoadedActionButtons").style.display =
@@ -203,7 +202,7 @@
         }
       }
 
-      // ... (getFileIconClass, displayFileList, formatBytes, downloadAllAsZip functions remain the same as previous) ...
+      
       function getFileIconClass(fileName) {
         const ext = fileName.split(".").pop().toLowerCase();
         if (["jpg", "jpeg", "png", "gif", "bmp", "svg"].includes(ext))
@@ -326,7 +325,7 @@
         }
       }
     </script>
-    <!-- OLD SIMPLER FOOTER STRUCTURE -->
+    
     <footer class="app-footer">
       <div class="footer-column">
         <p>Made by <strong>Satyam Malviya</strong></p>
@@ -340,9 +339,9 @@
       </div>
       
       <div class="footer-column">
-        <p>and <strong>Mehul Kumar Chawra</strong></p>
+        <p>and <strong>Khushi Rathore</strong></p>
         <a
-          href="https://www.linkedin.com/in/mehul-chawra-69295a258"
+          href="https://www.linkedin.com/in/khushi-rathore-1841a4253"
           target="_blank"
           ><img
             src="https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png"
