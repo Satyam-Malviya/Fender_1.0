@@ -1,8 +1,9 @@
 const express = require('express');
 const multer = require('multer');
+const fs = require('fs');
 const { uploadFileToFolder, listFilesFromFolder, getZippedFolderStream, generateSignedUrl } = require('../utils/s3Helper');
 const router = express.Router();
-const upload = multer();
+const upload = multer({ dest: 'uploads/' });
 
 // POST /api/folder/upload-file - For uploading individual files within a folder context
 router.post('/upload-file', upload.single('file'), async(req, res) => {
@@ -12,16 +13,24 @@ router.post('/upload-file', upload.single('file'), async(req, res) => {
         }
         const { folderShareId, relativePath } = req.body;
         if (!folderShareId || !relativePath) {
+            fs.unlinkSync(req.file.path); // delete file
             return res.status(400).json({ error: 'folderShareId and relativePath are required.' });
         }
 
         const s3Key = `${folderShareId}/${relativePath}`;
-        const result = await uploadFileToFolder(req.file, s3Key); // uploadFileToFolder takes file obj and s3Key
+        const result = await uploadFileToFolder(req.file, s3Key); 
+        
+        // Temp file delete karo
+        fs.unlinkSync(req.file.path); // <--- YE ADD KARO
+
         res.status(200).json({
-            message: `File ${relativePath} uploaded successfully to folder ${folderShareId}`,
+            message: `File ${relativePath} uploaded successfully`,
             s3_url: result.Location
         });
     } catch (error) {
+        if (req.file && fs.existsSync(req.file.path)) {
+            fs.unlinkSync(req.file.path);
+        }
         console.error('Folder File Upload Error:', error);
         res.status(500).json({ error: error.message });
     }

@@ -1,9 +1,10 @@
 const express = require('express');
 const multer = require('multer');
+const fs = require('fs');
 // Assuming s3Helper.js exports uploadFile and generateSignedUrl
 const { uploadFile, generateSignedUrl } = require('../utils/s3Helper');
 const router = express.Router();
-const upload = multer(); // Uses memory storage by default
+const upload = multer({ dest: 'uploads/' }); // Uses memory storage by default
 
 // POST /api/files/upload - For single file upload
 router.post('/upload', upload.single('file'), async(req, res) => {
@@ -11,14 +12,22 @@ router.post('/upload', upload.single('file'), async(req, res) => {
         if (!req.file) {
             return res.status(400).json({ error: 'No file uploaded.' });
         }
-        // Pass the entire file object from multer to s3Helper
-        const result = await uploadFile(req.file); // s3Helper.uploadFile will use file.originalname as key
+        
+        const result = await uploadFile(req.file); 
+        
+        // S3 par upload hone ke baad temporary file ko server se delete kar do
+        fs.unlinkSync(req.file.path); // <--- YE ADD KARO
+
         res.status(200).json({
             message: 'File uploaded successfully!',
-            fileName: req.file.originalname, // This is what the older share.html expects
-            s3_url: result.Location // The direct S3 URL (usually not shared)
+            fileName: req.file.originalname, 
+            s3_url: result.Location 
         });
     } catch (error) {
+        // Agar error aayi toh bhi temp file delete karo
+        if (req.file && fs.existsSync(req.file.path)) {
+            fs.unlinkSync(req.file.path);
+        }
         console.error('Single File Upload Error:', error);
         res.status(500).json({ error: error.message });
     }

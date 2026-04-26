@@ -1,5 +1,6 @@
 const AWS = require('aws-sdk');
 const archiver = require('archiver');
+const fs = require('fs');
 
 // Ab hum strictly .env file par depend karenge
 const S3_BUCKET_NAME = process.env.S3_BUCKET_NAME;
@@ -13,36 +14,39 @@ const s3 = new AWS.S3({
 // ... baaki niche ka tumhara saara code waisa hi rahega (uploadFile, generateSignedUrl etc.)
 
 // For single file uploads (original functionality)
-const uploadFile = async(fileObject) => { // Expects multer file object
+// Single file upload
+const uploadFile = async(fileObject) => { 
+    const fileStream = fs.createReadStream(fileObject.path); // <--- STREAM BANAO
+    
     const params = {
         Bucket: S3_BUCKET_NAME,
-        Key: fileObject.originalname, // Using original filename as key
-        Body: fileObject.buffer,
+        Key: fileObject.originalname, 
+        Body: fileStream, // <--- BUFFER KI JAGAH STREAM BHEJO
         ContentType: fileObject.mimetype,
     };
     try {
-        const result = await s3.upload(params).promise();
-        return result; // { ETag, Location, Key, Bucket }
+        return await s3.upload(params).promise();
     } catch (error) {
         console.error("S3 Single File Upload Error:", error);
         throw new Error(`S3 Upload Error: ${error.message}`);
     }
 };
 
-// For uploading files as part of a folder (key is pre-determined)
+// Folder wali upload
 const uploadFileToFolder = async(fileObject, s3Key) => {
+    const fileStream = fs.createReadStream(fileObject.path); // <--- STREAM BANAO
+
     const params = {
         Bucket: S3_BUCKET_NAME,
-        Key: s3Key, // e.g., "folderShareId/path/to/file.ext"
-        Body: fileObject.buffer,
+        Key: s3Key, 
+        Body: fileStream, // <--- BUFFER KI JAGAH STREAM BHEJO
         ContentType: fileObject.mimetype,
-        Metadata: { // Store original filename if needed, though s3Key here is usually the relative path
+        Metadata: { 
             'original-filename': fileObject.originalname
         }
     };
     try {
-        const result = await s3.upload(params).promise();
-        return result;
+        return await s3.upload(params).promise();
     } catch (error) {
         console.error("S3 Upload to Folder Error:", error);
         throw new Error(`S3 Folder Upload Error: ${error.message}`);
