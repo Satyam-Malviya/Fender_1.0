@@ -124,26 +124,22 @@
         let identifier = idFromUrl
           ? idFromUrl.trim()
           : document.getElementById("folderIdentifierInput").value.trim();
-        document.getElementById("fileListContainerOuter").style.display =
-          "none";
+          
+        document.getElementById("fileListContainerOuter").style.display = "none";
         document.getElementById("fileListContainerOuter").innerHTML = "";
-        document.getElementById("folderLoadedActionButtons").style.display =
-          "none";
+        document.getElementById("folderLoadedActionButtons").style.display = "none";
         document.getElementById("downloadAllBtn").style.display = "none"; 
 
-        if (!identifier) {
-          
-          return;
-        }
+        if (!identifier) return;
+
+        
         try {
-          /* ... URL parsing logic ... */
+          const urlObj = new URL(identifier);
+          if (urlObj.searchParams.has("id")) {
+            identifier = urlObj.searchParams.get("id");
+          }
         } catch (e) {
           
-        }
-        if (!identifier) {
-          
-          return;
-        }
 
         currentFolderShareId = identifier;
         setStatus(
@@ -151,54 +147,38 @@
           "info"
         );
 
+        
         try {
           const response = await fetch(
             `/api/folder/list/${currentFolderShareId}`
           );
+          
           if (!response.ok) {
-            
-            throw new Error(/* ... */);
+             const errorData = await response.json().catch(() => ({}));
+             throw new Error(errorData.error || `Server Error: ${response.status}`);
           }
+          
           const data = await response.json();
 
-          
-          document.getElementById("folderLoadedActionButtons").style.display =
-            "flex";
-          
-          document.getElementById("initialActionButtons").style.display =
-            "none";
+          document.getElementById("folderLoadedActionButtons").style.display = "flex";
+          document.getElementById("initialActionButtons").style.display = "none";
 
+          // 4. File List Dikhana
           if (data.files && data.files.length > 0) {
-            
-            document.getElementById("fileListContainerOuter").style.display =
-              "block";
+            document.getElementById("fileListContainerOuter").style.display = "block";
             displayFileList(data.files);
-            document.getElementById("downloadAllBtn").style.display =
-              "inline-block";
+            document.getElementById("downloadAllBtn").style.display = "inline-block";
             setStatus(`Folder contents loaded successfully.`, "success");
           } else {
-            
             setStatus("This folder is empty or does not exist.", "info");
             document.getElementById("fileListContainerOuter").innerHTML =
               '<p style="text-align:center; padding:20px;">No files found in this shared folder.</p>';
-            document.getElementById("fileListContainerOuter").style.display =
-              "block";
-            document.getElementById("downloadAllBtn").style.display = "none";
+            document.getElementById("fileListContainerOuter").style.display = "block";
           }
         } catch (error) {
-          
           console.error("Error fetching folder list:", error);
           setStatus(`Error: ${error.message}`, "error");
-          document.getElementById(
-            "fileListContainerOuter"
-          ).innerHTML = `<p style="text-align:center; padding:20px;">Could not load folder: ${error.message}</p>`;
-          document.getElementById("fileListContainerOuter").style.display =
-            "block";
-          
-          document.getElementById("initialActionButtons").style.display =
-            "flex";
-          document.getElementById("folderLoadedActionButtons").style.display =
-            "none";
+          document.getElementById("initialActionButtons").style.display = "flex";
         }
       }
 
