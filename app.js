@@ -35,8 +35,8 @@ app.get('/receive-folder', (req, res) => {
 
 
 
-app.use('/api/files', fileRoutes); // For single files
-app.use('/api/folder', folderRoutes); // NEW - For folders
+app.use('/api/files', fileRoutes); 
+app.use('/api/folder', folderRoutes); 
 
 
 const PORT = process.env.PORT || 5000;
