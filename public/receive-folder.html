@@ -140,6 +140,7 @@
           }
         } catch (e) {
           
+        }
 
         currentFolderShareId = identifier;
         setStatus(
@@ -163,7 +164,7 @@
           document.getElementById("folderLoadedActionButtons").style.display = "flex";
           document.getElementById("initialActionButtons").style.display = "none";
 
-          // 4. File List Dikhana
+          
           if (data.files && data.files.length > 0) {
             document.getElementById("fileListContainerOuter").style.display = "block";
             displayFileList(data.files);
